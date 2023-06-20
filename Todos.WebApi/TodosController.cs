@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Todos.WebApi;
 
+[Route("[controller]")]
 public class TodosController : ControllerBase
 {
     public static readonly Dictionary<Guid, DateTime?> Cache = new();
@@ -17,17 +18,17 @@ public class TodosController : ControllerBase
     }
 
     [HttpPost("create-in-sync-mode")]
-    public async Task<ActionResult> CreateInSyncMode(CreateTodoItemCmd cmd)
+    public async Task<ActionResult> CreateInSyncMode([FromBody] CreateTodoItemCmd cmd)
     {
         var response = await _requestClient.GetResponse<CreateTodoItemResult, CreateTodoItemError>(cmd);
 
-        if(response.Message is CreateTodoItemError error) return Conflict(error.Message);
+        if(response.Message is CreateTodoItemError error) return Conflict(response.Message);
 
         return Ok(response.Message as CreateTodoItemResult);
     }
 
     [HttpPost("create-in-async-mode")]
-    public async Task<ActionResult> CreateInAsyncMode(CreateTodoItemCmd cmd)
+    public async Task<ActionResult> CreateInAsyncMode([FromBody] CreateTodoItemCmd cmd)
     {
         var processingId = Guid.NewGuid();
         Cache.Add(processingId, null);

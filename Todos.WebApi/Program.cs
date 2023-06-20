@@ -1,23 +1,31 @@
 using System.Reflection;
-using Todos.WebApi;
 
-var builder = WebApplication.CreateBuilder(args);
-var services = builder.Services;
+namespace Todos.WebApi;
 
-services.SetupMassTransit(builder.Configuration, Assembly.GetCallingAssembly());
-services.AddControllers();
-services.AddEndpointsApiExplorer();
-services.AddSwaggerGen();
-
-var app = builder.Build();
-app.UseSwagger();
-app.UseSwaggerUI();
-app.UseRouting();
-
-app.UseEndpoints(endpoints =>
+public class Program
 {
-    endpoints.MapControllers();
-    //endpoints.MapHealthChecksEndpoints();
-});
+    public static async Task Main(string[] args)
+    {
 
-app.Run();
+        var builder = WebApplication.CreateBuilder(args);
+        var services = builder.Services;
+
+        services.SetupMassTransit(builder.Configuration, Assembly.GetCallingAssembly());
+        services.AddControllers();
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen();
+
+        var app = builder.Build();
+        app.UseSwagger();
+        app.UseSwaggerUI();
+        app.UseRouting();
+
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapControllers();
+            //endpoints.MapHealthChecksEndpoints();
+        });
+
+        await app.RunAsync();
+    }
+}

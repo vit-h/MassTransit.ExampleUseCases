@@ -1,13 +1,21 @@
-﻿using Microsoft.Extensions.Hosting;
-using System.Reflection;
+﻿using System.Reflection;
+using Microsoft.Extensions.Hosting;
 using Todos.WebApi;
 
-var currentAssembly = Assembly.GetExecutingAssembly();
+namespace Todos.Worker;
 
-var builder = Host.CreateDefaultBuilder(args);
-builder.ConfigureServices((hostContext, services) =>
+public class Program
 {
-    services.SetupMassTransit(hostContext.Configuration, currentAssembly);
-});
+    public static async Task Main(string[] args)
+    {
+        var currentAssembly = Assembly.GetExecutingAssembly();
 
-await builder.Build().RunAsync();
+        var builder = Host.CreateDefaultBuilder(args);
+        builder.ConfigureServices((hostContext, services) =>
+        {
+            services.SetupMassTransit(hostContext.Configuration, currentAssembly);
+        });
+
+        await builder.Build().RunAsync();
+    }
+}

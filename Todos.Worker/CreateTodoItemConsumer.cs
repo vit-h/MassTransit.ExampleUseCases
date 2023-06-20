@@ -9,6 +9,8 @@ public class CreateTodoItemConsumer : IConsumer<CreateTodoItemCmd>
 
     public CreateTodoItemConsumer(IPublishEndpoint publisher) => _publisher = publisher;
 
+    private readonly Action<SendContext> _setCustomHeader = context => context.Headers.Set("myCustomHeader", 123);
+
     public async Task Consume(ConsumeContext<CreateTodoItemCmd> context)
     {
         var cmd = context.Message;
@@ -17,7 +19,7 @@ public class CreateTodoItemConsumer : IConsumer<CreateTodoItemCmd>
         if (cmd.Text == "Exist") //await _db.TodoItems.Any(x => x.Text == cmd.Text);
         {
             // Respond back with the Error
-            await context.RespondAsync(new CreateTodoItemError("Item already exist"));
+            await context.RespondAsync(new CreateTodoItemError("Item already exist") as object, _setCustomHeader);
             return;
         }
 
@@ -31,6 +33,6 @@ public class CreateTodoItemConsumer : IConsumer<CreateTodoItemCmd>
         await _publisher.Publish(new TodoItemCreatedNotification(newTodoItemId));
 
         // Respond back with the Result
-        await context.RespondAsync(new CreateTodoItemResult(newTodoItemId, DateTime.UtcNow));
+        await context.RespondAsync(new CreateTodoItemResult(newTodoItemId, DateTime.UtcNow) as object, _setCustomHeader);
     }
 }
